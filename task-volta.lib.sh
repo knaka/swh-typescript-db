@@ -3,6 +3,8 @@ set -o nounset -o errexit
 
 test "${guard_ca67a57+set}" = set && return 0; guard_ca67a57=-
 
+. task.sh
+
 subcmd_volta() ( # Executes volta command.
   # Releases · volta-cli/volta https://github.com/volta-cli/volta/releases
   cmd_base=volta
@@ -53,16 +55,16 @@ subcmd_volta() ( # Executes volta command.
 )
 
 subcmd_npm() ( # Run npm.
-  cd "$(dirname "$0")" || exit 1
+  cd "$script_dir_path" || exit 1
   subcmd_volta run npm "$@"
 )
 
 subcmd_npx() ( # Run npx.
-  cd "$(dirname "$0")" || exit 1
+  cd "$script_dir_path" || exit 1
   subcmd_volta run npx "$@"
 )
 
 subcmd_node() (
-  cd "$(dirname "$0")" || exit 1
+  cd "$script_dir_path" || exit 1
   subcmd_volta run node "$@"
 )
