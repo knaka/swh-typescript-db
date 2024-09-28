@@ -8,6 +8,7 @@ then
   trap "rm -fr \"$temp_dir_path\"" EXIT
   curl --fail --location --output "$temp_dir_path"/task https://raw.githubusercontent.com/knaka/src/main/task
   cat "$temp_dir_path"/task > "$0"
+  rm -fr "$temp_dir_path"
   exit 0
 fi
 ARG0="$0"
