@@ -132,3 +132,4 @@ dist
 .idea
 build
 /.gobin
+/main.db
