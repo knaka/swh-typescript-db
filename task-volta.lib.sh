@@ -52,12 +52,17 @@ subcmd_volta() ( # Executes volta command.
   PATH="$volta_dir_path:$PATH" "$cmd_base" "$@"
 )
 
-subcmd_npm() { # Run npm.
+subcmd_npm() ( # Run npm.
   cd "$(dirname "$0")" || exit 1
   subcmd_volta run npm "$@"
-}
+)
 
-subcmd_npx() { # Run npx.
+subcmd_npx() ( # Run npx.
   cd "$(dirname "$0")" || exit 1
   subcmd_volta run npx "$@"
-}
+)
+
+subcmd_node() (
+  cd "$(dirname "$0")" || exit 1
+  subcmd_volta run node "$@"
+)
