@@ -1,1 +1,2 @@
 github.com/sqldef/sqldef/cmd/sqlite3def@v0.17.19
+github.com/sqlc-dev/sqlc/cmd/sqlc@v1.27.0

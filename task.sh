@@ -161,7 +161,7 @@ cross_run() (
   shift
   for ext in .exe .cmd .bat
   do
-    if test -x "$cmd$ext"
+    if type "$cmd$ext" > /dev/null 2>&1
     then
       "$cmd$ext" "$@"
       return $?
@@ -323,10 +323,11 @@ main() {
   fi
 
   subcmd="$1"
+  subcmd="$(echo "$subcmd" | sed -r -e 's/:/__/g')"
   if type subcmd_"$subcmd" > /dev/null 2>&1
   then
     shift
-    subcmd_"$subcmd" "$@"
+    subcmd_"$subcmd" "$@" || exit $?
     exit 0
   fi
 
