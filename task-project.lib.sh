@@ -62,10 +62,40 @@ task_db__cli() {
   subcmd_sqlite3 "$db_file_path"
 }
 
-task_db__gen() {
+task_db__gen() (
   cd "$script_dir_path" || exit 1
   cross_run ./cmd-gobin run sqlc generate
-}
+  for file in sqlcgen/*.ts
+  do
+    IFS=''
+    while read -r line
+    do
+      args="$(echo "$line" | sed -n -E -e 's/^.* stmt\.(get|all|run)\((.*)\).*$/\2/p')"
+      if test -n "$args"
+      then
+        i=1
+        obj=
+        delim=
+        while true
+        do
+          arg="${args%%, *}"
+          obj="$obj$delim$i: $arg"
+          i=$((i + 1))
+          delim=", "
+          args="${args#*, }"
+          if test "$arg" = "$args"
+          then
+            break
+          fi
+        done
+        obj="{ $obj }"
+        line="$(echo "$line" | sed -E -e "s/stmt\.(get|all|run)\((.*)\)/stmt.\1($obj)/")"
+      fi
+      echo "$line"
+    done < "$file" > "$file.tmp"
+    mv "$file.tmp" "$file"
+  done
+)
 
 task_db__plugin__build() {
   cd "$script_dir_path" || exit 1
@@ -79,9 +109,7 @@ task_db__plugin__build() {
     git clone https://github.com/sqlc-dev/sqlc-gen-typescript.git
   fi
   cd sqlc-gen-typescript
-  cp ../../task.sh .
-  cp ../../task-volta.lib.sh .
-  cp ../../task-javy.lib.sh .
+  cp ../../task.sh ../../task-*.lib.sh .
   sh task.sh npm install
   # https://github.com/sqlc-dev/sqlc-gen-typescript/blob/main/.github/workflows/ci.yml
   sh task.sh npx tsc --noEmit

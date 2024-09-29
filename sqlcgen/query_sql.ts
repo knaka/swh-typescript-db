@@ -6,11 +6,12 @@ export const getUserQuery = `-- name: GetUser :one
 SELECT id, username, updated_at, created_at
 FROM users
 WHERE
-  -- id = sqlc.arg(id)
-  id = ?
+  CASE WHEN CAST(?1 AS number) IS NOT NULL THEN id = ?1 ELSE false END OR
+  id = ?2
 LIMIT 1`;
 
 export interface GetUserArgs {
+    nullableId: any | null;
     id: number;
 }
 
@@ -23,10 +24,49 @@ export interface GetUserRow {
 
 export async function getUser(database: Database, args: GetUserArgs): Promise<GetUserRow | null> {
     const stmt = database.prepare(getUserQuery);
-    const result = await stmt.get(args.id);
+    const result = await stmt.get({ 1: args.nullableId, 2: args.id });
     if (result == undefined) {
         return null;
     }
     return result as GetUserRow;
+}
+
+export const getTheUserQuery = `-- name: GetTheUser :many
+;
+
+SELECT id, username, updated_at, created_at
+FROM users
+WHERE
+  id = ?1`;
+
+export interface GetTheUserArgs {
+    id: number;
+}
+
+export interface GetTheUserRow {
+    id: number;
+    username: any;
+    updatedAt: Date;
+    createdAt: Date;
+}
+
+export async function getTheUser(database: Database, args: GetTheUserArgs): Promise<GetTheUserRow[]> {
+    const stmt = database.prepare(getTheUserQuery);
+    const result = await stmt.all({ 1: args.id });
+    return result as GetTheUserRow[];
+}
+
+export const addUserQuery = `-- name: AddUser :exec
+;
+
+INSERT INTO users (username) VALUES (?1)`;
+
+export interface AddUserArgs {
+    username: any;
+}
+
+export async function addUser(database: Database, args: AddUserArgs): Promise<void> {
+    const stmt = database.prepare(addUserQuery);
+    await stmt.run({ 1: args.username });
 }
 
