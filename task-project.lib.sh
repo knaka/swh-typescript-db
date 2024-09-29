@@ -92,7 +92,7 @@ task_db__gen() ( # Executes the SQLC generator.
         obj="{ $obj }"
         line="$(echo "$line" | sed -E -e "s/stmt\.(get|all|run)\((.*)\)/stmt.\1($obj)/")"
       fi
-      # Nullable is NULL if not specified. Not to specify `null` explicitly.
+      # Nullable is NULL if not specified (= undefined). Not to specify `null` explicitly.
       line="$(echo "$line" | sed -E -e 's/([_[:alnum:]]+)(: .* \| null;)/\1?\2/')"
       echo "$line"
     done < "$file" > "$file.tmp"
