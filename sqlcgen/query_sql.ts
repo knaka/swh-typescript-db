@@ -6,13 +6,13 @@ export const getUserQuery = `-- name: GetUser :one
 SELECT id, username, updated_at, created_at
 FROM users
 WHERE
-  CASE WHEN CAST(?1 AS number) IS NOT NULL THEN id = CAST(?1 AS number) ELSE false END OR
-  id = ?2
+  CASE WHEN CAST(?1 AS integer) IS NOT NULL THEN id = ?1 ELSE false END OR
+  CASE WHEN CAST(?2 AS string) IS NOT NULL THEN username = ?2 ELSE false END
 LIMIT 1`;
 
 export interface GetUserArgs {
-    nullableId: any | null;
-    id: number;
+    nullableId?: number | null;
+    nullableUsername?: any | null;
 }
 
 export interface GetUserRow {
@@ -24,7 +24,7 @@ export interface GetUserRow {
 
 export async function getUser(database: Database, args: GetUserArgs): Promise<GetUserRow | null> {
     const stmt = database.prepare(getUserQuery);
-    const result = await stmt.get({ 1: args.nullableId, 2: args.id });
+    const result = await stmt.get({ 1: args.nullableId, 2: args.nullableUsername });
     if (result == undefined) {
         return null;
     }
