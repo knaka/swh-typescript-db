@@ -2,7 +2,7 @@
 SELECT *
 FROM users
 WHERE
-  CASE WHEN CAST(sqlc.narg(nullable_id) AS number) IS NOT NULL THEN id = sqlc.narg(nullable_id) ELSE false END OR
+  CASE WHEN CAST(sqlc.narg(nullable_id) AS number) IS NOT NULL THEN id = CAST(sqlc.narg(nullable_id) AS number) ELSE false END OR
   id = sqlc.arg(id)
 LIMIT 1
 ;

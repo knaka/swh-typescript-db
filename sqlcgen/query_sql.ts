@@ -6,7 +6,7 @@ export const getUserQuery = `-- name: GetUser :one
 SELECT id, username, updated_at, created_at
 FROM users
 WHERE
-  CASE WHEN CAST(?1 AS number) IS NOT NULL THEN id = ?1 ELSE false END OR
+  CASE WHEN CAST(?1 AS number) IS NOT NULL THEN id = CAST(?1 AS number) ELSE false END OR
   id = ?2
 LIMIT 1`;
 
