@@ -20,27 +20,27 @@ set_dir_sync_ignored "$script_dir_path"/build
 db_file_path="$script_dir_path"/main.db
 schema_file_path="$script_dir_path"/schema.sql
 
-task_db__create() {
+task_db__create() { # Creates the database.
   cd "$script_dir_path" || exit 1
   subcmd_sqlite3 "$db_file_path" "VACUUM"
 }
 
-task_db__drop() {
+task_db__drop() { # Drops the database.
   cd "$script_dir_path" || exit 1
   rm -f "$db_file_path"
 }
 
-task_db__dump() {
+task_db__dump() { # Dumps the database.
   cd "$script_dir_path" || exit 1
   subcmd_sqlite3 "$db_file_path" ".dump"
 }
 
-task_db__migrate() {
+task_db__migrate() { # Migrates the database.
   cd "$script_dir_path" || exit 1
   cross_run ./cmd-gobin run sqlite3def --file="${schema_file_path}" "${db_file_path}"
 }
 
-task_db__diff() {
+task_db__diff() { # Compares the schema with the current database.
   cd "$script_dir_path" || exit 1
   if ! test -f "${db_file_path}"
   then
@@ -57,20 +57,21 @@ task_db__diff() {
   cross_run ./cmd-gobin run sqlite3def --file="${schema_file_path}" build/current.db --dry-run
 }
 
-task_db__cli() {
+task_db__cli() { # Starts the SQLite3 CLI.
   cd "$script_dir_path" || exit 1
   subcmd_sqlite3 "$db_file_path"
 }
 
-task_db__gen() (
+task_db__gen() ( # Executes the SQLC generator.
   cd "$script_dir_path" || exit 1
   cross_run ./cmd-gobin run sqlc generate
+  # Currently, the generator does not support the numbered parameters. // SQL Language Expressions https://www.sqlite.org/lang_expr.html
   for file in sqlcgen/*.ts
   do
     IFS=''
     while read -r line
     do
-      args="$(echo "$line" | sed -n -E -e 's/^.* stmt\.(get|all|run)\((.*)\).*$/\2/p')"
+      args="$(echo "$line" | sed -n -E -e "s/^.* stmt\.(get|all|run)\((.*)\).*$/\2/p")"
       if test -n "$args"
       then
         i=1
@@ -97,7 +98,8 @@ task_db__gen() (
   done
 )
 
-task_db__plugin__build() {
+task_db__plugin__build() { # Builds the gen-typescript plugin.
+  # Currently, the published WASM on sqlc.dev does not support SQLite3.
   cd "$script_dir_path" || exit 1
   if test -r build/sqlc-gen-typescript/examples/plugin.wasm
   then
@@ -117,11 +119,11 @@ task_db__plugin__build() {
   sh task.sh javy build out.js -o examples/plugin.wasm
 }
 
-subcmd_run() {
+subcmd_run() { # Runs the test program.
   subcmd_npx ts-node --prefer-ts-exts index.ts
 }
 
-task_db__seed() {
+task_db__seed() { # Seeds the database.
   cd "$script_dir_path" || exit 1
   subcmd_sqlite3 "$db_file_path" ".read seed.sql"
 }
