@@ -1,10 +1,10 @@
 import Database from "better-sqlite3";
-import { getAuthor } from "./sqlcgen/query_sql"
+import { getUser } from "./sqlcgen/query_sql"
 
 const db = new Database("main.db");
 
 async function main() {
-  const user = await getAuthor(db, { id: 1 })
+  const user = await getUser(db, { id: 1 })
   if (user) {
     console.log(user)
   } else {

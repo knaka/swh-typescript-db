@@ -2,7 +2,7 @@
 
 import { Database } from "better-sqlite3";
 
-export const getAuthorQuery = `-- name: GetAuthor :one
+export const getUserQuery = `-- name: GetUser :one
 SELECT id, username, updated_at, created_at
 FROM users
 WHERE
@@ -10,23 +10,23 @@ WHERE
   id = ?
 LIMIT 1`;
 
-export interface GetAuthorArgs {
+export interface GetUserArgs {
     id: number;
 }
 
-export interface GetAuthorRow {
+export interface GetUserRow {
     id: number;
     username: any;
     updatedAt: Date;
     createdAt: Date;
 }
 
-export async function getAuthor(database: Database, args: GetAuthorArgs): Promise<GetAuthorRow | null> {
-    const stmt = database.prepare(getAuthorQuery);
+export async function getUser(database: Database, args: GetUserArgs): Promise<GetUserRow | null> {
+    const stmt = database.prepare(getUserQuery);
     const result = await stmt.get(args.id);
     if (result == undefined) {
         return null;
     }
-    return result as GetAuthorRow;
+    return result as GetUserRow;
 }
 
