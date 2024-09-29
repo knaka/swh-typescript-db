@@ -23,6 +23,7 @@ export interface GetUserRow {
 }
 
 export async function getUser(database: Database, args: GetUserArgs): Promise<GetUserRow | null> {
+    console.error("getUser: nullableId", args.nullableId, "nullableUsername", args.nullableUsername);
     const stmt = database.prepare(getUserQuery);
     const result = await stmt.get({ 1: args.nullableId, 2: args.nullableUsername });
     if (result == undefined) {
